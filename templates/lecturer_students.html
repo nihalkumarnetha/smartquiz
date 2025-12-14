@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}Student Progress - SmartQuiz{% endblock %}
+
+{% block extra_style %}
+<style>
+    .students-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+    
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .page-header h1 {
+        font-size: 28px;
+        margin: 0;
+    }
+    
+    .search-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .search-bar input {
+        flex: 1;
+        max-width: 300px;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+    
+    .students-table {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .students-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    thead {
+        background: #007bff;
+        color: white;
+    }
+    
+    th {
+        padding: 15px 20px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    
+    td {
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        font-size: 14px;
+    }
+    
+    tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .student-name {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .score-display {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 5px;
+        font-weight: 600;
+        font-size: 13px;
+    }
+    
+    .score-excellent {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .score-good {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .score-fair {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .score-poor {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .action-btn {
+        display: inline-block;
+        padding: 6px 12px;
+        background: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 13px;
+        transition: background 0.3s;
+    }
+    
+    .action-btn:hover {
+        background: #0056b3;
+    }
+    
+    .empty-state {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        text-align: center;
+        color: #999;
+    }
+    
+    .stats-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .stat-card h3 {
+        color: #999;
+        font-size: 12px;
+        font-weight: 600;
+        margin: 0 0 10px;
+        text-transform: uppercase;
+    }
+    
+    .stat-value {
+        font-size: 28px;
+        font-weight: bold;
+        color: #007bff;
+        margin: 0;
+    }
+    
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        table {
+            font-size: 12px;
+        }
+        
+        th, td {
+            padding: 10px 12px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="students-container">
+    <div class="page-header">
+        <div>
+            <h1>Student Progress</h1>
+            <p style="color: #999; margin: 5px 0 0;">Track students who attempted your quizzes</p>
+        </div>
+    </div>
+    
+    <!-- Summary Stats -->
+    <div class="stats-summary">
+        <div class="stat-card">
+            <h3>Total Students</h3>
+            <p class="stat-value">{{ students | length }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Your Quizzes</h3>
+            <p class="stat-value">{{ total_lecturer_quizzes }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Total Attempts</h3>
+            <p class="stat-value">
+                {% set total_attempts = students | map(attribute='total_attempts') | sum %}
+                {{ total_attempts }}
+            </p>
+        </div>
+    </div>
+    
+    <!-- Students Table -->
+    {% if students %}
+    <div class="students-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Email</th>
+                    <th>Quizzes Attempted</th>
+                    <th>Total Attempts</th>
+                    <th>Average Score</th>
+                    <th>Last Attempt</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td><span class="student-name">{{ student['username'] }}</span></td>
+                    <td>{{ student['email'] }}</td>
+                    <td>{{ student['quizzes_attempted'] }} / {{ total_lecturer_quizzes }}</td>
+                    <td>{{ student['total_attempts'] }}</td>
+                    <td>
+                        {% set avg_score = student['avg_score'] | round(1) %}
+                        {% if avg_score >= 80 %}
+                            <span class="score-display score-excellent">{{ avg_score }}%</span>
+                        {% elif avg_score >= 60 %}
+                            <span class="score-display score-good">{{ avg_score }}%</span>
+                        {% elif avg_score >= 40 %}
+                            <span class="score-display score-fair">{{ avg_score }}%</span>
+                        {% else %}
+                            <span class="score-display score-poor">{{ avg_score }}%</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if student['last_attempt'] %}
+                            {{ student['last_attempt'].strftime('%Y-%m-%d %H:%M') if student['last_attempt'] else 'Never' }}
+                        {% else %}
+                            Never
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('lecturer_student_analytics', student_id=student['id']) }}" class="action-btn">
+                            View Analytics
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>No Students Yet</h3>
+        <p>No students have attempted your quizzes. Create a quiz and share it with your students to get started.</p>
+        <a href="{{ url_for('create_quiz') }}" class="btn" style="margin-top: 20px;">Create Quiz</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Optional: Add search/filter functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('.search-bar input');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const rows = document.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const studentName = row.querySelector('.student-name').textContent.toLowerCase();
+                    const email = row.cells[1].textContent.toLowerCase();
+                    if (studentName.includes(searchTerm) || email.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

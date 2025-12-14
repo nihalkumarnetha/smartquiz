@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Result - SmartQuiz{% endblock %}
+
+{% block extra_style %}
+<style>
+    .result-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 8px;
+        text-align: center;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .result-header h2 {
+        margin: 0 0 1rem 0;
+        font-size: 2rem;
+    }
+    
+    .score-display {
+        font-size: 4rem;
+        font-weight: bold;
+        margin: 1rem 0;
+        animation: slideDown 0.6s ease;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .percentage {
+        font-size: 1.8rem;
+        opacity: 0.95;
+        margin-top: 1rem;
+    }
+    
+    .result-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 25px;
+        margin-top: 1rem;
+        font-weight: 600;
+    }
+    
+    .result-container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    
+    .result-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .result-info {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .result-info:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .result-info-group {
+        flex: 1;
+    }
+    
+    .result-label {
+        color: #999;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .result-value {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .performance-indicator {
+        text-align: center;
+        margin: 2rem 0;
+    }
+    
+    .performance-bar {
+        width: 100%;
+        height: 8px;
+        background: #e0e0e0;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+    }
+    
+    .performance-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.6s ease;
+    }
+    
+    .performance-fill.excellent {
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        width: 90%;
+    }
+    
+    .performance-fill.good {
+        background: linear-gradient(90deg, #56ab2f, #a8e063);
+        width: 75%;
+    }
+    
+    .performance-fill.average {
+        background: linear-gradient(90deg, #f59e0b, #f97316);
+        width: 50%;
+    }
+    
+    .performance-fill.poor {
+        background: linear-gradient(90deg, #ef4444, #dc2626);
+        width: 30%;
+    }
+    
+    .performance-text {
+        font-size: 1rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .btn-primary {
+        flex: 1;
+        padding: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        text-align: center;
+        font-weight: 600;
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+        flex: 1;
+        padding: 1rem;
+        background: #f5f5f5;
+        color: #333;
+        text-decoration: none;
+        border-radius: 6px;
+        text-align: center;
+        font-weight: 600;
+        transition: background 0.3s;
+    }
+    
+    .btn-secondary:hover {
+        background: #e8e8e8;
+    }
+    
+    .congratulations {
+        text-align: center;
+        font-size: 1.2rem;
+        color: #667eea;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+<div class="result-header">
+    <h2>✅ Quiz Completed!</h2>
+    <div class="score-display">{{ result['score'] }}/{{ result['total_questions'] }}</div>
+    <div class="percentage">{{ ((result['score'] / result['total_questions']) * 100)|int }}%</div>
+    {% set percentage = ((result['score'] / result['total_questions']) * 100)|int %}
+    {% if percentage >= 80 %}
+        <div class="result-badge">🌟 Excellent Performance!</div>
+    {% elif percentage >= 60 %}
+        <div class="result-badge">👍 Good Job!</div>
+    {% elif percentage >= 40 %}
+        <div class="result-badge">📚 Keep Practicing</div>
+    {% else %}
+        <div class="result-badge">💪 Try Again</div>
+    {% endif %}
+</div>
+
+<div class="result-container">
+    <div class="result-card">
+        {% if percentage >= 80 %}
+            <div class="congratulations">🎉 Congratulations! You performed excellently!</div>
+        {% elif percentage >= 60 %}
+            <div class="congratulations">Great work! You did very well on this quiz.</div>
+        {% endif %}
+        
+        <div class="performance-indicator">
+            <div class="performance-bar">
+                {% if percentage >= 80 %}
+                    <div class="performance-fill excellent" style="width: {{ percentage }}%;"></div>
+                {% elif percentage >= 60 %}
+                    <div class="performance-fill good" style="width: {{ percentage }}%;"></div>
+                {% elif percentage >= 40 %}
+                    <div class="performance-fill average" style="width: {{ percentage }}%;"></div>
+                {% else %}
+                    <div class="performance-fill poor" style="width: {{ percentage }}%;"></div>
+                {% endif %}
+            </div>
+            <div class="performance-text">
+                {% if percentage >= 80 %}
+                    Excellent - You have strong knowledge of this topic!
+                {% elif percentage >= 60 %}
+                    Good - You understand most of the concepts.
+                {% elif percentage >= 40 %}
+                    Average - Review the material and try again.
+                {% else %}
+                    Needs Improvement - Take more time to study the material.
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="result-info">
+            <div class="result-info-group">
+                <div class="result-label">Quiz</div>
+                <div class="result-value">{{ result['title'] }}</div>
+            </div>
+        </div>
+        
+        <div class="result-info">
+            <div class="result-info-group">
+                <div class="result-label">Correct Answers</div>
+                <div class="result-value">{{ result['score'] }}/{{ result['total_questions'] }}</div>
+            </div>
+        </div>
+        
+        <div class="result-info">
+            <div class="result-info-group">
+                <div class="result-label">Completion Date & Time</div>
+                <div class="result-value">{{ result['completed_at'].strftime('%B %d, %Y at %I:%M %p') if result['completed_at'] else 'Unknown' }}</div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="{{ url_for('student_dashboard') }}" class="btn-primary">Back to Dashboard</a>
+            <a href="{{ url_for('take_quiz', quiz_id=result['quiz_id']) }}" class="btn-secondary">Retake Quiz</a>
+        </div>
+    </div>
+</div></div>
+{% endblock %}
