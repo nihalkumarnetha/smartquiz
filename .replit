@@ -1,0 +1,16 @@
+# This configuration file tells Replit how to run your project
+
+run = "python app.py"
+entrypoint = "app.py"
+
+[env]
+FLASK_ENV = "production"
+FLASK_APP = "app.py"
+PYTHONUNBUFFERED = "1"
+
+[nix]
+channel = "stable-23_11"
+
+[[ports]]
+localPort = 5000
+externalPort = 80

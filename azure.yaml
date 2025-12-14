@@ -1,0 +1,11 @@
+version: 1.0
+metadata:
+  template: smartquiz-python-template
+  description: SmartQuiz - Online Quiz Management System
+  author: SmartQuiz Team
+  
+services:
+  smartquizapp:
+    project: .
+    language: python
+    host: appservice
