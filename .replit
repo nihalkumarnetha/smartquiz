@@ -1,11 +1,11 @@
 # This configuration file tells Replit how to run your project
 
-run = "python app.py"
-entrypoint = "app.py"
+run = "python app_sqlite.py"
+entrypoint = "app_sqlite.py"
 
 [env]
 FLASK_ENV = "production"
-FLASK_APP = "app.py"
+FLASK_APP = "app_sqlite.py"
 PYTHONUNBUFFERED = "1"
 
 [nix]

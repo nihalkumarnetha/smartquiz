@@ -7,8 +7,8 @@ import os
 from functools import wraps
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
-app.secret_key = 'smartquiz-secret-key-2025'
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.secret_key = os.environ.get('SECRET_KEY', 'smartquiz-secret-key-2025')
+app.config['SECRET_KEY'] = app.secret_key
 app.config['SESSION_TIMEOUT'] = 1800  # 30 minutes session timeout
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 app.config['SESSION_COOKIE_SECURE'] = False  # Set True in production with HTTPS
